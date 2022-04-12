@@ -1,0 +1,172 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Thu Jun 24 10:16:43 2021
+
+@author: tkpci
+"""
+
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Wed Jun  9 11:56:24 2021
+
+@author: tkpci
+"""
+
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import seaborn as sns
+import csv
+from sklearn.metrics import mean_squared_error
+from sklearn.preprocessing import OneHotEncoder
+
+# Make numpy printouts easier to read.
+np.set_printoptions(precision=3, suppress=True)
+
+import tensorflow as tf
+
+from tensorflow import keras
+from tensorflow.keras import layers
+from tensorflow.keras.layers.experimental import preprocessing
+
+print(tf.__version__)
+
+
+
+df = pd.read_csv('/cis/staff/tkpci/Code/Python/NN/T10_11_emis10_11_emisclass_skintemp_200_30.csv', header=None)
+trainX = pd.DataFrame.to_numpy(df)
+
+
+
+# train_labels = trainX[:,4]
+# train_features = trainX[:,0:1]
+
+train_labels = trainX[:,5]
+
+
+# convert to one-hot encoding
+train_emis = trainX[:,4]
+enc = OneHotEncoder(handle_unknown='ignore')
+enc.fit(train_emis.reshape(-1,1))
+train_emis = enc.transform(train_emis.reshape(-1,1)).toarray()
+
+# give average emis 
+train_emis = trainX[:,4]
+train_emis = np.where(train_emis == 2, 0.9666093048461887, train_emis)
+train_emis = np.where(train_emis == 3, 0.962920417484459, train_emis)
+train_emis = np.where(train_emis == 4, 0.9913529582496282, train_emis)
+train_emis = np.reshape(train_emis, [42000,1])
+
+train_emis11 = trainX[:,4]
+train_emis11 = np.where(train_emis11 == 2, 0.9764874405298508, train_emis11)
+train_emis11 = np.where(train_emis11 == 3, 0.9632309169677844, train_emis11)
+train_emis11 = np.where(train_emis11 == 4, 0.9771265461434834, train_emis11)
+train_emis11 = np.reshape(train_emis11, [42000,1])
+
+# create one-hot to -1,1 that normalization does not affect it
+#train_emis = np.where(train_emis == 0,-0.333,0.666)
+
+train_features = np.append(trainX[:,0:2],train_emis , axis=1) 
+train_features = np.append(train_features,train_emis11 , axis=1) 
+    
+
+# normalizer = preprocessing.Normalization()
+
+# normalizer.adapt(np.array(train_features))
+
+# print(normalizer.mean.numpy())
+# print(normalizer.variance.numpy())
+
+# linear model RMSE = 0.75
+linear_model = tf.keras.Sequential([
+    normalizer,
+    layers.Dense(units=1)
+])
+
+linear_model = tf.keras.Sequential([
+    layers.Dense(units=1)
+])
+
+# DNN model RMSE = 0.82
+linear_model = tf.keras.Sequential([
+    layers.Dense(2, activation='relu'),
+    layers.Dense(1)
+])
+
+linear_model.compile(
+    optimizer=tf.optimizers.Adam(learning_rate=0.01),
+    loss='mean_squared_error')
+
+# linear_model.compile(
+#     optimizer=tf.optimizers.RMSprop(0.0099),
+#     loss='mean_squared_error')
+
+#reduce_lr = tf.keras.callbacks.ReduceLROnPlateau(monitor='val_loss', factor=0.5,
+#                              patience=5, min_lr=0.001)
+
+history = linear_model.fit(
+    train_features, train_labels, 
+    epochs=50,
+    # suppress logging
+    verbose=1,
+    # Calculate validation results on 20% of the training data
+    validation_split = 0.2)
+    #callbacks=[reduce_lr])
+
+
+test_y = linear_model.predict(train_features)
+print('Standard Deviation train set: ',np.sqrt(mean_squared_error(test_y,train_labels)))
+print('RMSE train set: ',np.std(np.squeeze(test_y)- train_labels))
+print('Mean error train set: ',np.mean(np.squeeze(test_y)- train_labels))
+    
+# test on surfrad data
+
+rd = open('/cis/staff/tkpci/Code/Python/NN/T10_11_emis10_11_Surfrad3LST.csv')
+
+rd = open('/cis/staff/tkpci/Code/Python/NN/T10_11_emis10_11_BuoyOceanLSTLST.csv')
+
+csv_reader = csv.reader(rd)
+data = list(csv_reader)
+data = np.asarray(data)
+temp = data.astype(float)
+
+trainX = temp[:,0:1]
+label = temp[:,4]
+
+
+test_y = linear_model.predict(trainX)
+print('RMSE Surfrad: ',np.sqrt(mean_squared_error(test_y,label)))
+print('Standard Deviation Surfrad: ',np.std(np.squeeze(test_y)- label))
+print('Mean error Surfrad: ',np.mean(np.squeeze(test_y)- label))
+
+np.savetxt('/cis/staff/tkpci/Code/Python/NN/SurfRad3_t1011_e1011_predictions_new_NN_onlyT.csv', test_y,delimiter=",")
+np.savetxt('/cis/staff/tkpci/Code/Python/NN/SurfRad3_t1011_e1011_predictions_new_NN_buoy_onlyT.csv', test_y,delimiter=",")
+
+
+linear_model.summary()
+
+
+
+
+
+def plot_loss(history):
+  plt.plot(history.history['loss'], label='loss')
+  plt.plot(history.history['val_loss'], label='val_loss')
+  plt.ylim([0, 10])
+  plt.xlabel('Epoch')
+  plt.ylabel('Error [MPG]')
+  plt.legend()
+  plt.grid(True)
+
+plot_loss(history)
+
+# test on scene
+
+
+
+
+
+
+

@@ -1,0 +1,21 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Mon Feb 28 08:04:07 2022
+
+@author: tkpci
+"""
+
+import os
+import numpy as np
+
+os.mkdir('/dirs/data/tirs/SW_analysis_2022')
+os.mkdir('/dirs/data/tirs/SW_analysis_2022/bilinear')
+os.mkdir('/dirs/data/tirs/SW_analysis_2022/cubic')
+os.mkdir('/dirs/data/tirs/SW_analysis_2022/nn')
+
+
+
+download_call = 'wget -m -P /dirs/data/tirs/SW_analysis_2022/bilinear https://edclpdsftp.cr.usgs.gov/downloads/provisional/land_surface_temperature/february_2022/resample_methods/bilinear/'
+
+os.system(download_call)

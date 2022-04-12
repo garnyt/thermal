@@ -1,0 +1,122 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Mon Jan  6 12:22:19 2020
+
+@author: tkpci
+
+Open Landsat scenes and calculate emissivity and SW
+"""
+
+import os
+import numpy as np
+import matplotlib.pyplot as plt
+import gdal
+from osgeo import osr, gdalconst
+from dataLandsatASTER import DataLandsatASTER
+from createSiteInfo import CreateSiteInfo
+import re
+
+
+def calc_final_emis_SW(folder, answer):
+    
+    dataAll = DataLandsatASTER()
+    
+    folder = folder + '/'
+    
+    # for single point only
+    if answer == 'single':
+        
+        siteInfo = CreateSiteInfo()
+    
+        # loop through all landsat files in folder
+        for file in os.listdir(folder):
+            
+            subfolder = folder + file + '/'
+            subfolder = folder
+            
+            # find pathrow of scene and look for the site in the sitedata files
+            pathrow = file[10:16]
+            
+            siteVal = siteInfo.getPathrow().index(pathrow)
+            lat = siteInfo.getLat()[siteVal]
+            lon = siteInfo.getLon()[siteVal]
+            sitename = siteInfo.getShortname()[siteVal]
+            emis13 = siteInfo.getE13()[siteVal]
+            emis14 = siteInfo.getE14()[siteVal]
+            asterNDVI = siteInfo.getAsterNDVI()[siteVal]
+            
+            
+            for names in os.listdir(subfolder):
+                
+                #get associated row col from lat lon
+                temp = subfolder + names
+                result = os.popen('gdallocationinfo -wgs84 %s %s %s' % (temp, lon, lat)).read()
+                
+                idx_temp = result.split('\n')[1]
+                tmp = re.findall(r'\d+', idx_temp)
+                idx_row = int(tmp[1])
+                idx_col= int(tmp[0])
+               
+                
+                if names.endswith("B3.TIF"):
+                    
+                    B3file = subfolder + names
+                    gdal.UseExceptions()
+                    rd=gdal.Open(B3file)                               
+                    band= rd.GetRasterBand(1)
+                    dataAll.addRad('rad3',band.ReadAsArray())
+                    
+                if names.endswith("B4.TIF"):
+                    B4file = subfolder + names
+                    gdal.UseExceptions()
+                    rd=gdal.Open(B3file)                               
+                    band= rd.GetRasterBand(1)
+                    dataAll.addRad('rad4',band.ReadAsArray())
+                    
+                if names.endswith("B5.TIF"):
+                    B5file = subfolder + names
+                    gdal.UseExceptions()
+                    rd=gdal.Open(B4file)                               
+                    band= rd.GetRasterBand(1)
+                    dataAll.addRad('rad5',band.ReadAsArray())
+                    
+                if names.endswith("B6.TIF"):
+                    B6file = subfolder + names
+                    gdal.UseExceptions()
+                    rd=gdal.Open(B3file)                               
+                    band= rd.GetRasterBand(1)
+                    dataAll.addRad('rad6',band.ReadAsArray())
+                    
+                if names.endswith("B10.TIF"):
+                    B10file = subfolder + names
+                    gdal.UseExceptions()
+                    rd=gdal.Open(B3file)                               
+                    band= rd.GetRasterBand(1)
+                    dataAll.addRad('rad10',band.ReadAsArray())
+                    
+                if names.endswith("B11.TIF"):
+                    B11file = subfolder + names
+                    gdal.UseExceptions()
+                    rd=gdal.Open(B3file)                               
+                    band= rd.GetRasterBand(1)
+                    dataAll.addRad('rad11',band.ReadAsArray())
+                    
+
+            # open Landsat files
+
+            gdal.UseExceptions()
+            rd=gdal.Open(B10file) 
+            
+            #dst_proj = rd.GetProjection()
+                        
+            band= rd.GetRasterBand(1)
+            B10= band.ReadAsArray()
+
+       
+
+    # for full scene results         
+    else:
+        print('not yet ready for full scenes')
+        
+

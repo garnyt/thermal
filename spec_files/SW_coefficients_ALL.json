@@ -1,0 +1,68 @@
+{
+    "TIRS_10": {
+        "estimated_coeff_1": 0.56789,
+        "estimated_coeff_2": 0.42249,
+        "estimated_coeff_3": 0.0099,
+        "snow_emis_value": 0.9904,
+        "vegetation_coeff": 0.9885,
+        "water_emissivity": 0.988,
+        "emis_regfit_10": 0.000972,
+        "landsat_uncertainty_10_K": 0.15
+    },
+    "TIRS_11": {
+        "estimated_coeff_1": -0.54148252,
+        "estimated_coeff_2": 1.4305094,
+        "estimated_coeff_3": 0.10916213,
+        "snow_emis_value": 0.9724,
+        "vegetation_coeff": 0.97,
+        "water_emissivity": 0.986448696154591,
+        "emis_regfit_11": 0.00545,
+        "landsat_uncertainty_11_K": 0.2
+    },
+    "TIRS2_10": {
+        "estimated_coeff_1": 0.6805076,
+        "estimated_coeff_2": 0.31538733,
+        "estimated_coeff_3": 0.00439255,
+        "snow_emis_value": 0.991146,
+        "vegetation_coeff": 0.9889,
+        "water_emissivity": 0.992921523229335,
+        "emis_regfit_10": 0.000594,
+        "landsat_uncertainty_10_K": 0.1
+    },
+    "TIRS2_11": {
+        "estimated_coeff_1": -0.58257351,
+        "estimated_coeff_2": 1.46527441,
+        "estimated_coeff_3": 0.11562234,
+        "snow_emis_value": 0.972072,
+        "vegetation_coeff": 0.9909,
+        "water_emissivity": 0.9863197349099047,
+        "emis_regfit_11": 0.005532,
+        "landsat_uncertainty_11_K": 0.1
+    },
+    "L8": {
+        "SW_coefficients": [
+            2.2925,
+            0.9929,
+            0.1545,
+            -0.3122,
+            3.7186,
+            0.3502,
+            -3.5889,
+            0.1825
+        ],
+        "SW_regfit": 0.7212
+    },
+    "L9": {
+        "SW_coefficients": [
+            2.14116823,
+            0.99391182,
+            0.15328625,
+            -0.27561351,
+            3.32215426,
+            0.32960457,
+            -2.93095085,
+            0.15652295
+        ],
+        "SW_regfit": 0.74161
+    }
+}
